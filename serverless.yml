@@ -1,0 +1,94 @@
+service: appointment
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    seed:
+      domain:
+        sources:
+          - table: ${self:provider.environment.TABLE_CANDIDATE}
+            sources: [./resources/seed_data.json]
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  stage: dev
+  environment:
+    TABLE_CANDIDATE: ${self:service}-${opt:stage, self:provider.stage}-candidate
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_CANDIDATE}"
+
+functions:
+  create:
+    handler: appointments/create.create
+    events:
+      - http:
+          path: appointments
+          method: post
+          cors: true
+          request:
+            schema:
+              application/json: ${file(./validator/create.json)}
+
+  list:
+    handler: appointments/list.list
+    events:
+      - http:
+          path: appointments
+          method: get
+          cors: true
+
+  get:
+    handler: appointments/get.get
+    events:
+      - http:
+          path: appointments/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: appointments/update.update
+    events:
+      - http:
+          path: appointments/{id}
+          method: put
+          cors: true
+
+resources:
+  Resources:
+    CandidateDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TABLE_CANDIDATE}
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline

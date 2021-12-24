@@ -1,0 +1,8 @@
+.DS_Store
+.serverless
+node_modules
+*.log
+.dynamodb
+dynamodb-local
+.history
+.build

@@ -1,0 +1,27 @@
+{
+    "definitions": {
+      "non-empty-string": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "title": "Create Offer Schema",
+    "required": ["name", "email", "date"],
+    "properties": {
+      "name": {
+        "type": "string",
+        "$ref": "#/definitions/non-empty-string"
+      },
+      "email": {
+        "type": "string",
+        "$ref": "#/definitions/non-empty-string"
+      },
+      "date": {
+        "type": "string",
+        "$ref": "#/definitions/non-empty-string"
+      }
+    }
+  }
+  
