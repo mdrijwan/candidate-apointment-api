@@ -3,16 +3,20 @@ import { DynamoDB } from 'aws-sdk'
 const dynamoDb = new DynamoDB.DocumentClient()
 
 export const get = (event, context, callback) => {
+  const id = event.pathParameters.id
   const params = {
-    TableName: process.env.TABLE_CANDIDATE,
-    Key: {
-      id: event.pathParameters.id
+    TableName : process.env.TABLE_CANDIDATE,
+    IndexName : 'Candidate-index',
+    KeyConditionExpression: '#id = :id',
+    ExpressionAttributeNames: {
+      '#id': 'id'
+    },
+    ExpressionAttributeValues: {
+      ':id': id
     }
   }
 
-  // fetch todo from the database
-  dynamoDb.get(params, (error, result) => {
-    // handle potential errors
+  dynamoDb.query(params, (error, result) => {
     if (error) {
       console.error(error)
       callback(null, {
@@ -23,12 +27,9 @@ export const get = (event, context, callback) => {
       return
     }
 
-    console.log('RESULT', result.Item)
-
-    // create a response
     const response = {
       statusCode: 200,
-      body: JSON.stringify(result.Item)
+      body: JSON.stringify(result.Items)
     }
     callback(null, response)
   })

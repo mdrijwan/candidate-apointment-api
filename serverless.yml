@@ -24,6 +24,7 @@ provider:
   stage: dev
   environment:
     TABLE_CANDIDATE: ${self:service}-${opt:stage, self:provider.stage}-candidate
+    S3_BUCKET: ${self:service}-${opt:stage, self:provider.stage}-candidate-s3
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -36,57 +37,68 @@ provider:
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_CANDIDATE}"
 
 functions:
-  create:
-    handler: appointments/create.create
+  candidate:
+    handler: api/create.candidate
     events:
       - http:
-          path: appointments
+          path: candidate
           method: post
           cors: true
           request:
             schema:
-              application/json: ${file(./validator/create.json)}
+              application/json: ${file(./validator/candidate.json)}
 
   list:
-    handler: appointments/list.list
+    handler: api/list.list
     events:
       - http:
-          path: appointments
+          path: candidate
           method: get
           cors: true
 
   get:
-    handler: appointments/get.get
+    handler: api/get.get
     events:
       - http:
-          path: appointments/{id}
+          path: appointment/{id}
           method: get
           cors: true
 
-  update:
-    handler: appointments/update.update
+  appointment:
+    handler: api/create.appointment
     events:
       - http:
-          path: appointments/{id}
+          path: appointment/{id}
           method: put
           cors: true
 
 resources:
   Resources:
     CandidateDynamoDbTable:
-      Type: "AWS::DynamoDB::Table"
+      Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
+        TableName: ${self:provider.environment.TABLE_CANDIDATE}
         AttributeDefinitions:
           - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
             AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.TABLE_CANDIDATE}
+          - AttributeName: date
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: Candidate-index
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        BillingMode: PAY_PER_REQUEST
 
 plugins:
   - serverless-plugin-typescript

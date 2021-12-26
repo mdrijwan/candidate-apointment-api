@@ -9,7 +9,8 @@ export const update = (event, context, callback) => {
   const params = {
     TableName: process.env.TABLE_CANDIDATE,
     Key: {
-      id: event.pathParameters.id
+      id: event.pathParameters.id,
+      date: event.pathParameters.date
     },
     ExpressionAttributeValues: {
       ':first_slot': data.first_slot,
@@ -20,10 +21,9 @@ export const update = (event, context, callback) => {
     UpdateExpression: 'SET first_slot = :first_slot, second_slot = :second_slot, third_slot = :third_slot, updatedAt = :updatedAt',
     ReturnValues: 'ALL_NEW'
   }
+  console.log('PARAMS', params)
 
-  // update the todo in the database
   dynamoDb.update(params, (error, result) => {
-    // handle potential errors
     if (error) {
       console.error(error)
       callback(null, {
@@ -34,7 +34,6 @@ export const update = (event, context, callback) => {
       return
     }
 
-    // create a response
     const response = {
       statusCode: 200,
       body: JSON.stringify(result.Attributes)
