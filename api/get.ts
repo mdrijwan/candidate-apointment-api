@@ -1,36 +1,24 @@
-import { DynamoDB } from 'aws-sdk'
+import { getData, formatJSONResponse, queryData } from './../helpers/common'
 
-const dynamoDb = new DynamoDB.DocumentClient()
-
-export const get = (event, context, callback) => {
-  const id = event.pathParameters.id
-  const params = {
-    TableName : process.env.TABLE_CANDIDATE,
-    IndexName : 'Candidate-index',
-    KeyConditionExpression: '#id = :id',
-    ExpressionAttributeNames: {
-      '#id': 'id'
-    },
-    ExpressionAttributeValues: {
-      ':id': id
-    }
+export const get = async (event, context, callback) => {
+  try {
+    const id = event.pathParameters.id
+    const date = event.queryStringParameters.date
+    const table = process.env.TABLE_CANDIDATE
+    const data = await getData(id, date, table)
+    return formatJSONResponse(200, data)
+  } catch (error) {
+    return formatJSONResponse(400, error)
   }
+}
 
-  dynamoDb.query(params, (error, result) => {
-    if (error) {
-      console.error(error)
-      callback(null, {
-        statusCode: error.statusCode || 501,
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Couldn\'t fetch the todo item.'
-      })
-      return
-    }
-
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(result.Items)
-    }
-    callback(null, response)
-  })
+export const query = async (event, context, callback) => {
+  try {
+    const id = event.pathParameters.id
+    const table = process.env.TABLE_CANDIDATE
+    const data = await queryData(id, table)
+    return formatJSONResponse(200, data)
+  } catch (error) {
+    return formatJSONResponse(400, error)
+  }
 }

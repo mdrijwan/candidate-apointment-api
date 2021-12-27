@@ -49,10 +49,18 @@ functions:
               application/json: ${file(./validator/candidate.json)}
 
   list:
-    handler: api/list.list
+    handler: api/list.listAll
     events:
       - http:
           path: candidate
+          method: get
+          cors: true
+
+  listCandidate:
+    handler: api/list.listCandidates
+    events:
+      - http:
+          path: candidate/{id}
           method: get
           cors: true
 
@@ -71,6 +79,14 @@ functions:
           path: appointment/{id}
           method: put
           cors: true
+        
+  availability:
+    handler: api/get.query
+    events:
+      - http:
+          path: availability/{id}
+          method: get
+          cors: true
 
 resources:
   Resources:
@@ -84,6 +100,8 @@ resources:
             AttributeType: S
           - AttributeName: date
             AttributeType: S
+          - AttributeName: availability
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -94,6 +112,8 @@ resources:
             KeySchema:
               - AttributeName: id
                 KeyType: HASH
+              - AttributeName: availability
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
         StreamSpecification:

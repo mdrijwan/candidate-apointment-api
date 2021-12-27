@@ -6,7 +6,7 @@
     "1pm-2pm" : true,
     "2pm-3pm" : true,
     "3pm-4pm" : false,
-    "availability" : true
+    "availability" : "yes"
 },
 {
     "id": "12346",
@@ -16,7 +16,7 @@
     "1pm-2pm" : true,
     "2pm-3pm" : true,
     "3pm-4pm" : false,
-    "availability" : true
+    "availability" : "yes"
 },
 {
     "id": "12347",
@@ -26,5 +26,5 @@
     "1pm-2pm" : true,
     "2pm-3pm" : true,
     "3pm-4pm" : false,
-    "availability" : true
+    "availability" : "yes"
 }]
