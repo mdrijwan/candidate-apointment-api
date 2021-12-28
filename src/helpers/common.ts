@@ -36,35 +36,12 @@ export async function updateData (id, data) {
   let obj = candidateName.find(o => o.name)
   const name = obj.name
   const email = obj.email
-  let update = 'SET #c_name = :name, email = :email, updatedAt = :updatedAt'
-  let value = { ':updatedAt': now, ':name': name, ':email': email }
-  console.log({
-    d1: data.first_slot, d2: data.second_slot, d3: data.third_slot
-  })
+  let update = 'SET #c_name = :name, email = :email, first_slot = :first_slot, second_slot = :second_slot, third_slot = :third_slot, updatedAt = :updatedAt'
+  let value = { ':name': name, ':email': email, ':first_slot': data.first_slot, ':second_slot': data.second_slot, ':third_slot': data.third_slot, ':updatedAt': now }
 
   if (existingData === undefined) {
     update += ', createdAt = :createdAt'
     value = Object.assign(value, { ':createdAt': now })
-  }
-
-  if (existingData === undefined && (data.first_slot === undefined || data.second_slot === undefined || data.third_slot === undefined)) {
-    update += ', availability = :availability'
-    value = Object.assign(value, { ':availability': 'yes' })
-  }
-
-  if (existingData === undefined && data.first_slot === undefined) {
-    update += ', first_slot = :first_slot'
-    value = Object.assign(value, { ':first_slot': 'available' })
-  }
-
-  if (existingData === undefined && data.second_slot === undefined) {
-    update += ', second_slot = :second_slot'
-    value = Object.assign(value, { ':second_slot': 'available' })
-  }
-
-  if (existingData === undefined && data.third_slot === undefined) {
-    update += ', third_slot = :third_slot'
-    value = Object.assign(value, { ':third_slot': 'available' })
   }
 
   if (data.first_slot === 'available' || data.second_slot === 'available' || data.third_slot === 'available') {
@@ -72,26 +49,10 @@ export async function updateData (id, data) {
     value = Object.assign(value, { ':availability': 'yes' })
   }
 
-  if (existingData === undefined && data.first_slot === 'booked' && data.second_slot === 'booked' && data.third_slot === 'booked') {
+  if (data.first_slot === 'booked' && data.second_slot === 'booked' && data.third_slot === 'booked') {
     update += ', availability = :availability'
     value = Object.assign(value, { ':availability': 'no' })
   }
-
-  if (data.first_slot != null) {
-    update += ', first_slot = :first_slot'
-    value = Object.assign(value, { ':first_slot': data.first_slot })
-  }
-
-  if (data.second_slot != null) {
-    update += ', second_slot = :second_slot'
-    value = Object.assign(value, { ':second_slot': data.second_slot })
-  }
-
-  if (data.third_slot != null) {
-    update += ', third_slot = :third_slot'
-    value = Object.assign(value, { ':third_slot': data.third_slot })
-  }
-  console.log({ 'update': update, 'value': value })
 
   const result = await dynamoDb.update({
     TableName : table,
