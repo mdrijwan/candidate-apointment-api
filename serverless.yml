@@ -15,7 +15,7 @@ custom:
       domain:
         sources:
           - table: ${self:provider.environment.TABLE_CANDIDATE}
-            sources: [./src/resources/seed_data.json]
+            sources: [./src/resources/seedData.json]
 
 provider:
   name: aws
