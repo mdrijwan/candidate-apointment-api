@@ -5,10 +5,14 @@ import { createData, updateData } from '../helpers/common'
 const today = new Date().toISOString().slice(0, 10)
 const now = new Date().getTime()
 
-export const candidate = async () => {
+export const candidate = async (event) => {
+  const data = JSON.parse(event.body)
+  console.log('BODY', data)
   try {
     const item = {
       id: uuid.v4(),
+      name: data.name,
+      email: data.email,
       date: today,
       first_slot: 'available',
       second_slot: 'available',
@@ -17,6 +21,7 @@ export const candidate = async () => {
       createdAt: now,
       updatedAt: now
     }
+    console.log('ITEM', item)
     const candidateData = await createData(item)
     return formatResponse(200, candidateData)
   } catch (error) {
