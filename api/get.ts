@@ -1,24 +1,23 @@
-import { getData, formatJSONResponse, queryData } from './../helpers/common'
+import { formatResponse } from '../helpers/formatter'
+import { getData, queryData } from './../helpers/common'
 
-export const get = async (event, context, callback) => {
+export const appointment = async event => {
   try {
     const id = event.pathParameters.id
     const date = event.queryStringParameters.date
-    const table = process.env.TABLE_CANDIDATE
-    const data = await getData(id, date, table)
-    return formatJSONResponse(200, data)
+    const data = await getData(id, date)
+    return formatResponse(200, data)
   } catch (error) {
-    return formatJSONResponse(400, error)
+    return formatResponse(400, error)
   }
 }
 
-export const query = async (event, context, callback) => {
+export const availability = async event => {
   try {
     const id = event.pathParameters.id
-    const table = process.env.TABLE_CANDIDATE
-    const data = await queryData(id, table)
-    return formatJSONResponse(200, data)
+    const data = await queryData(id)
+    return formatResponse(200, data)
   } catch (error) {
-    return formatJSONResponse(400, error)
+    return formatResponse(400, error)
   }
 }
