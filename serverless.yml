@@ -55,6 +55,9 @@ functions:
           path: appointment/{id}
           method: put
           cors: true
+          request:
+            schema:
+              application/json: ${file(./src/validator/appointment.json)}
 
   listCandidates:
     handler: src/api/list.candidates
