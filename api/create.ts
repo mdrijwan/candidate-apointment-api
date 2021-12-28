@@ -1,12 +1,11 @@
 import * as uuid from 'uuid'
-import { createData, formatJSONResponse, updateData } from '../helpers/common'
+import { formatResponse } from '../helpers/formatter'
+import { createData, updateData } from '../helpers/common'
 
-const table = process.env.TABLE_CANDIDATE
 const today = new Date().toISOString().slice(0, 10)
 const now = new Date().getTime()
 
-export const candidate = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false
+export const candidate = async () => {
   try {
     const item = {
       id: uuid.v4(),
@@ -18,21 +17,20 @@ export const candidate = async (event, context, callback) => {
       createdAt: now,
       updatedAt: now
     }
-    const candidateData = await createData(item, table)
-    return formatJSONResponse(200, candidateData)
+    const candidateData = await createData(item)
+    return formatResponse(200, candidateData)
   } catch (error) {
-    return formatJSONResponse(400, error)
+    return formatResponse(400, error)
   }
 }
 
-export const appointment = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false
+export const appointment = async (event) => {
   try {
     const id = event.pathParameters.id
     const data = JSON.parse(event.body)
-    const appointmentData = await updateData(id, data, table)
-    return formatJSONResponse(200, appointmentData)
+    const appointmentData = await updateData(id, data)
+    return formatResponse(200, appointmentData)
   } catch (error) {
-    return formatJSONResponse(400, error)
+    return formatResponse(400, error)
   }
 }
