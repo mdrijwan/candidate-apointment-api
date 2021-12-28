@@ -70,13 +70,13 @@ npm run deploy
 - PUT/
   + PUT/appointment/{id} `(Create Appointments for a given Candidate)`
 
-  ***Functions***
-  - createCandidate
-  - createAppointment
-  - listCandidates
-  - listAppointments
-  - getAppointment
-  - getAvailability
+***Functions***
+- createCandidate
+- createAppointment
+- listCandidates
+- listAppointments
+- getAppointment
+- getAvailability
 
 
 ### Project Structure
