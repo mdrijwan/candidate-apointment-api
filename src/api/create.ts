@@ -7,7 +7,6 @@ const now = new Date().getTime()
 
 export const candidate = async (event) => {
   const data = JSON.parse(event.body)
-  console.log('BODY', data)
   try {
     const item = {
       id: uuid.v4(),
@@ -21,7 +20,6 @@ export const candidate = async (event) => {
       createdAt: now,
       updatedAt: now
     }
-    console.log('ITEM', item)
     const candidateData = await createData(item)
     return formatResponse(200, candidateData)
   } catch (error) {
