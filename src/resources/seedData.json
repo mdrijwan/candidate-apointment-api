@@ -1,0 +1,22 @@
+[
+    {
+       "id":"12345",
+       "name":"mdrijwan",
+       "email":"mdrijwan@github.com",
+       "date":"2021-12-25",
+       "first_slot":"available",
+       "second_slot":"available",
+       "third_slot":"booked",
+       "availability":"yes"
+    },
+    {
+       "id":"67890",
+       "name":"rijwan",
+       "email":"md@rijwan.com",
+       "date":"2021-12-25",
+       "first_slot":"booked",
+       "second_slot":"booked",
+       "third_slot":"booked",
+       "availability":"no"
+    }
+ ]
