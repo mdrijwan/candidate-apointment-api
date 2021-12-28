@@ -1,10 +1,12 @@
 import { DynamoDB } from 'aws-sdk'
+import { Candidate } from './model'
 
 const dynamoDb = new DynamoDB.DocumentClient()
 const today = new Date().toISOString().slice(0, 10)
 const now = new Date().getTime()
+const table = process.env.TABLE_CANDIDATE
 
-export async function getData (id, date, table) {
+export async function getData (id, date) {
   let items: Candidate
   const result = await dynamoDb.get({
     TableName : table,
@@ -19,7 +21,7 @@ export async function getData (id, date, table) {
   return items
 }
 
-export async function createData (candidate: Candidate, table) {
+export async function createData (candidate: Candidate) {
   await dynamoDb.put({
     TableName : table,
     Item: candidate
@@ -27,9 +29,9 @@ export async function createData (candidate: Candidate, table) {
   return candidate
 }
 
-export async function updateData (id, data, table) {
+export async function updateData (id, data) {
   const date = data.date ? data.date : today
-  const existingData = await getData(id, date, table)
+  const existingData = await getData(id, date)
   let update = 'SET updatedAt = :updatedAt'
   let value = {
     ':updatedAt': now
@@ -40,12 +42,32 @@ export async function updateData (id, data, table) {
     value = Object.assign(value, { ':createdAt': now })
   }
 
+  if (existingData === undefined && (data.first_slot === undefined || data.second_slot === undefined || data.third_slot === undefined)) {
+    update += ', availability = :availability'
+    value = Object.assign(value, { ':availability': 'yes' })
+  }
+
+  if (existingData === undefined && data.first_slot === undefined) {
+    update += ', first_slot = :first_slot'
+    value = Object.assign(value, { ':first_slot': 'available' })
+  }
+
+  if (existingData === undefined && data.second_slot === undefined) {
+    update += ', second_slot = :second_slot'
+    value = Object.assign(value, { ':second_slot': 'available' })
+  }
+
+  if (existingData === undefined && data.third_slot === undefined) {
+    update += ', third_slot = :third_slot'
+    value = Object.assign(value, { ':third_slot': 'available' })
+  }
+
   if (data.first_slot === 'available' || data.second_slot === 'available' || data.third_slot === 'available') {
     update += ', availability = :availability'
     value = Object.assign(value, { ':availability': 'yes' })
   }
 
-  if (data.first_slot === 'booked' && data.second_slot === 'booked' && data.third_slot === 'booked') {
+  if (existingData === undefined && data.first_slot === 'booked' && data.second_slot === 'booked' && data.third_slot === 'booked') {
     update += ', availability = :availability'
     value = Object.assign(value, { ':availability': 'no' })
   }
@@ -64,6 +86,8 @@ export async function updateData (id, data, table) {
     update += ', third_slot = :third_slot'
     value = Object.assign(value, { ':third_slot': data.third_slot })
   }
+  console.log({ 'update': update, 'value': value })
+
   const result = await dynamoDb.update({
     TableName : table,
     Key: {
@@ -77,7 +101,7 @@ export async function updateData (id, data, table) {
   return result.Attributes
 }
 
-export async function queryData (id, table) {
+export async function queryData (id) {
   const result = await dynamoDb.query({
     TableName : table,
     IndexName : 'Candidate-index',
@@ -90,7 +114,7 @@ export async function queryData (id, table) {
   return result.Items
 }
 
-export async function scanData (id, table) {
+export async function scanData (id) {
   const result = await dynamoDb.scan({
     TableName : table,
     FilterExpression: 'id = :id',
@@ -101,20 +125,9 @@ export async function scanData (id, table) {
   return result.Items
 }
 
-export const formatJSONResponse = (statusCode: number, response: any): any => {
-  return {
-    statusCode,
-    body: JSON.stringify(response)
-  }
-}
-
-export interface Candidate {
-  id: string,
-  date: string,
-  first_slot: string,
-  second_slot: string,
-  third_slot: string,
-  availability: string,
-  createdAt: number,
-  updatedAt: number
+export async function scanTable () {
+  const result = await dynamoDb.scan({
+    TableName : table
+  }).promise()
+  return result.Items
 }
