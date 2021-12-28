@@ -4,9 +4,9 @@
   "description": "Sample API services to create, modify and delete appointments",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "serverless dynamodb install",
     "start": "sls offline start --verbose",
-    "preinstall": "serverless dynamodb install"
+    "deploy": "sls deploy --verbose"
   },
   "keywords": [
     "CRUD",
