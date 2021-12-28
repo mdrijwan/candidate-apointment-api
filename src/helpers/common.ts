@@ -21,21 +21,26 @@ export async function getData (id, date) {
   return items
 }
 
-export async function createData (candidate: Candidate) {
+export async function createData (item: Candidate) {
   await dynamoDb.put({
     TableName : table,
-    Item: candidate
+    Item: item
   }).promise()
-  return candidate
+  return item
 }
 
 export async function updateData (id, data) {
   const date = data.date ? data.date : today
   const existingData = await getData(id, date)
-  let update = 'SET updatedAt = :updatedAt'
-  let value = {
-    ':updatedAt': now
-  }
+  const candidateName = await getName(id)
+  let obj = candidateName.find(o => o.name)
+  const name = obj.name
+  const email = obj.email
+  let update = 'SET #c_name = :name, email = :email, updatedAt = :updatedAt'
+  let value = { ':updatedAt': now, ':name': name, ':email': email }
+  console.log({
+    d1: data.first_slot, d2: data.second_slot, d3: data.third_slot
+  })
 
   if (existingData === undefined) {
     update += ', createdAt = :createdAt'
@@ -95,6 +100,9 @@ export async function updateData (id, data) {
       date: date
     },
     ExpressionAttributeValues: value,
+    ExpressionAttributeNames: {
+      '#c_name': 'name'
+    },
     UpdateExpression: update,
     ReturnValues: 'ALL_NEW'
   }).promise()
@@ -128,6 +136,21 @@ export async function scanData (id) {
 export async function scanTable () {
   const result = await dynamoDb.scan({
     TableName : table
+  }).promise()
+  return result.Items
+}
+
+export async function getName (id) {
+  const result = await dynamoDb.query({
+    TableName : table,
+    KeyConditionExpression: 'id = :id',
+    FilterExpression: 'attribute_exists(#c_name)',
+    ExpressionAttributeValues: {
+      ':id': id
+    },
+    ExpressionAttributeNames: {
+      '#c_name': 'name'
+    }
   }).promise()
   return result.Items
 }
