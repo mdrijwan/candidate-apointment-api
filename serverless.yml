@@ -37,7 +37,7 @@ provider:
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_CANDIDATE}"
 
 functions:
-  candidate:
+  createCandidate:
     handler: api/create.candidate
     events:
       - http:
@@ -48,40 +48,40 @@ functions:
             schema:
               application/json: ${file(./validator/candidate.json)}
 
-  list:
-    handler: api/list.listAll
-    events:
-      - http:
-          path: candidate
-          method: get
-          cors: true
-
-  listCandidate:
-    handler: api/list.listCandidates
-    events:
-      - http:
-          path: candidate/{id}
-          method: get
-          cors: true
-
-  get:
-    handler: api/get.get
-    events:
-      - http:
-          path: appointment/{id}
-          method: get
-          cors: true
-
-  appointment:
+  createAppointment:
     handler: api/create.appointment
     events:
       - http:
           path: appointment/{id}
           method: put
           cors: true
-        
-  availability:
-    handler: api/get.query
+
+  listCandidates:
+    handler: api/list.candidates
+    events:
+      - http:
+          path: candidate
+          method: get
+          cors: true
+
+  listAppointments:
+    handler: api/list.appointments
+    events:
+      - http:
+          path: candidate/{id}
+          method: get
+          cors: true
+
+  getAppointment:
+    handler: api/get.appointment
+    events:
+      - http:
+          path: appointment/{id}
+          method: get
+          cors: true
+
+  getAvailability:
+    handler: api/get.availability
     events:
       - http:
           path: availability/{id}
