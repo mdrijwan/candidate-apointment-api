@@ -17,11 +17,7 @@
             "date": "2021-12-22"
         }
     ],
-    "anyOf": [
-        { "required": ["first_slot"] },
-        { "required": ["second_slot"] },
-        { "required": ["third_slot"] }
-      ],
+    "required": ["first_slot", "second_slot", "third_slot"],
     "properties": {
         "first_slot": {
             "$id": "#/properties/first_slot",
