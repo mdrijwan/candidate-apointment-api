@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "definitions": {
+        "non-empty-string": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "Create Appointment Schema",
+    "examples": [
+        {
+            "first_slot": "booked",
+            "second_slot": "booked",
+            "third_slot": "available",
+            "date": "2021-12-22"
+        }
+    ],
+    "anyOf": [
+        { "required": ["first_slot"] },
+        { "required": ["second_slot"] },
+        { "required": ["third_slot"] }
+      ],
+    "properties": {
+        "first_slot": {
+            "$id": "#/properties/first_slot",
+            "type": "string",
+            "title": "The first_slot schema",
+            "enum": [
+                "booked",
+                "available"
+            ],
+            "examples": [
+                "booked"
+            ]
+        },
+        "second_slot": {
+            "$id": "#/properties/second_slot",
+            "type": "string",
+            "title": "The second_slot schema",
+            "enum": [
+                "booked",
+                "available"
+            ],
+            "examples": [
+                "booked"
+            ]
+        },
+        "third_slot": {
+            "$id": "#/properties/third_slot",
+            "type": "string",
+            "title": "The third_slot schema",
+            "enum": [
+                "booked",
+                "available"
+            ],
+            "examples": [
+                "available"
+            ]
+        },
+        "date": {
+            "type": "string",
+            "$ref": "#/definitions/non-empty-string"
+        }
+    },
+    "additionalProperties": false
+}
