@@ -74,9 +74,38 @@ export async function queryData (id) {
   const result = await dynamoDb.query({
     TableName : table,
     IndexName : 'Candidate-Availability-index',
-    KeyConditionExpression: 'id = :id and availability = :availability',
+    KeyConditionExpression: 'availability = :availability',
+    FilterExpression: 'id = :id',
     ExpressionAttributeValues: {
-      ':id': id,
+      ':availability': 'yes',
+      ':id': id
+    }
+  }).promise()
+  return result.Items
+}
+
+export async function queryDate (date) {
+  const result = await dynamoDb.query({
+    TableName : table,
+    IndexName : 'Candidate-Availability-index',
+    KeyConditionExpression: 'availability = :availability and #date = :date',
+    ExpressionAttributeNames: {
+      '#date': 'date'
+    },
+    ExpressionAttributeValues: {
+      ':availability': 'yes',
+      ':date': date
+    }
+  }).promise()
+  return result.Items
+}
+
+export async function queryAvailability () {
+  const result = await dynamoDb.query({
+    TableName : table,
+    IndexName : 'Candidate-Availability-index',
+    KeyConditionExpression: 'availability = :availability',
+    ExpressionAttributeValues: {
       ':availability': 'yes'
     }
   }).promise()
