@@ -1,4 +1,4 @@
-service: appointment
+service: candidate-api
 custom:
   dynamodb:
     stages:
@@ -14,17 +14,19 @@ custom:
     seed:
       domain:
         sources:
-          - table: ${self:provider.environment.TABLE_CANDIDATE}
+          - table: ${self:provider.environment.DYNAMODB_TABLE}
             sources: [./src/resources/seedData.json]
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   region: us-east-1
   stage: dev
+  deploymentBucket:
+    name: ${self:provider.environment.S3_BUCKET}
   environment:
-    TABLE_CANDIDATE: ${self:service}-${opt:stage, self:provider.stage}-candidate
-    S3_BUCKET: ${self:service}-${opt:stage, self:provider.stage}-candidate-s3
+    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-candidate-table
+    S3_BUCKET: ${opt:stage, self:provider.stage}-candidate-bucket
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -34,7 +36,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_CANDIDATE}"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*"
 
 functions:
   createCandidate:
@@ -91,39 +93,5 @@ functions:
           method: get
           cors: true
 
-resources:
-  Resources:
-    CandidateDynamoDbTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      Properties:
-        TableName: ${self:provider.environment.TABLE_CANDIDATE}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-          - AttributeName: date
-            AttributeType: S
-          - AttributeName: availability
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-          - AttributeName: date
-            KeyType: RANGE
-        GlobalSecondaryIndexes:
-          - IndexName: Candidate-index
-            KeySchema:
-              - AttributeName: id
-                KeyType: HASH
-              - AttributeName: availability
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        StreamSpecification:
-          StreamViewType: NEW_AND_OLD_IMAGES
-        BillingMode: PAY_PER_REQUEST
-
 plugins:
   - serverless-plugin-typescript
-  - serverless-dynamodb-local
-  - serverless-offline

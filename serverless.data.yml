@@ -1,0 +1,60 @@
+service: candidate-data
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: rijwan-dev-s3
+  environment:
+    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-candidate-table
+    S3_BUCKET: ${opt:stage, self:provider.stage}-candidate-bucket
+
+resources:
+  Resources:
+    CandidateBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.S3_BUCKET}
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+          - AllowedMethods:
+            - GET
+            - PUT
+            - POST
+            - HEAD
+            AllowedOrigins:
+            - "*"
+            AllowedHeaders:
+            - "*"
+    CandidateDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+          - AttributeName: availability
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: Candidate-Availability-index
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+              - AttributeName: availability
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        BillingMode: PAY_PER_REQUEST
