@@ -61,7 +61,9 @@ npm run deploy
 - GET/
   + GET/candidate `(List all the Candidates)`
   + GET/candidate/{id} `(List all the Appointments for a given Candidate)`
-  + GET/appointment/{id} `(List all the Appointments for a given Candidate on a specific date)`
+  + GET/appointment/{id}?{date} `(List all the Appointments for a given Candidate on a given date)`
+  + GET/availability} `(List all the Available Appointments for a all Candidates)`
+  + GET/availability/?{date} `(List all the Available Appointments for a all Candidates on a given date)`
   + GET/availability/{id} `(List all the Available Appointments for a given Candidate)`
  
 - POST/
@@ -75,6 +77,7 @@ npm run deploy
 - createAppointment
 - listCandidates
 - listAppointments
+- listAvailability
 - getAppointment
 - getAvailability
 
@@ -95,11 +98,14 @@ aws-serverless-api
 │ ├─ resources
 │ │ └─ seedData.json
 │ ├─ validator
-│ │ └─ candidate.json
+│ │ ├─ candidate.json
+│ │ └─ appointment.json
 ├─ .gitignore
 ├─ package.json
 ├─ package-lock.json
 ├─ serverless.yml
+├─ serverless.data.yml
+├─ serverless.local.yml
 ├─ tsconfig.json
 └─ tslint.json
 
