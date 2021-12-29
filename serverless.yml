@@ -77,6 +77,14 @@ functions:
           method: get
           cors: true
 
+  listAvailability:
+    handler: src/api/list.availability
+    events:
+      - http:
+          path: availability
+          method: get
+          cors: true
+
   getAppointment:
     handler: src/api/get.appointment
     events:
