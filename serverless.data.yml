@@ -49,9 +49,9 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: Candidate-Availability-index
             KeySchema:
-              - AttributeName: id
-                KeyType: HASH
               - AttributeName: availability
+                KeyType: HASH
+              - AttributeName: date
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
