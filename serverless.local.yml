@@ -1,0 +1,139 @@
+service: candidate-local
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    seed:
+      domain:
+        sources:
+          - table: ${self:provider.environment.DYNAMODB_TABLE}
+            sources: [./src/resources/seedData.json]
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: dev
+  environment:
+    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-candidate-table
+    S3_BUCKET: ${opt:stage, self:provider.stage}-candidate-bucket
+    DYNAMODB_INDEX: Candidate-Availability-index
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  createCandidate:
+    handler: src/api/create.candidate
+    events:
+      - http:
+          path: candidate
+          method: post
+          cors: true
+          request:
+            schema:
+              application/json: ${file(./src/validator/candidate.json)}
+
+  createAppointment:
+    handler: src/api/create.appointment
+    events:
+      - http:
+          path: appointment/{id}
+          method: put
+          cors: true
+          request:
+            schema:
+              application/json: ${file(./src/validator/appointment.json)}
+
+  listCandidates:
+    handler: src/api/list.candidates
+    events:
+      - http:
+          path: candidate
+          method: get
+          cors: true
+
+  listAppointments:
+    handler: src/api/list.appointments
+    events:
+      - http:
+          path: candidate/{id}
+          method: get
+          cors: true
+
+  listAvailability:
+    handler: src/api/list.availability
+    events:
+      - http:
+          path: availability
+          method: get
+          cors: true
+
+  getAppointment:
+    handler: src/api/get.appointment
+    events:
+      - http:
+          path: appointment/{id}
+          method: get
+          cors: true
+
+  getAvailability:
+    handler: src/api/get.availability
+    events:
+      - http:
+          path: availability/{id}
+          method: get
+          cors: true
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline
+
+resources:
+  Resources:
+    CandidateDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+          - AttributeName: availability
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.DYNAMODB_INDEX}
+            KeySchema:
+              - AttributeName: availability
+                KeyType: HASH
+              - AttributeName: date
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        BillingMode: PAY_PER_REQUEST
+
