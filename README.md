@@ -37,8 +37,7 @@ Run the command below to install NPM dependencies
 npm install
 ```
 
-This project is powered by TypeScript so no compilation needed.
-You need to install dynamodb local but no worries, pre-install script will do that for you automatically.
+To install dynamodb for local development
 
 ```
 sls dynamodb install
@@ -50,10 +49,19 @@ Then start the server and follow the instructions in the console.
 npm run start
 ```
 
-To deploy on your own AWS environment
+To deploy the data resources on AWS
+```
+npm run predeploy
+```
+
+To deploy the stack on AWS
 ```
 npm run deploy
 ```
+
+>- This project is powered by TypeScript so no compilation needed.
+>- You need to install dynamodb-local for local development but no worries, `preinstall` script will do that for you automatically.
+>- You need to deploy data resources before deploying the stackbut no worries, `predeploy` script will do that for you automatically.
 
 ### Let's get started!
 
