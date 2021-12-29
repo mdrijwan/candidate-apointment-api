@@ -17,12 +17,14 @@ export const candidate = async (event) => {
       second_slot: 'available',
       third_slot: 'available',
       availability: 'yes',
-      createdAt: now,
-      updatedAt: now
+      created_at: now,
+      updated_at: now
     }
     const candidateData = await createData(item)
+    console.log('DATA', candidateData)
     return formatResponse(200, candidateData)
   } catch (error) {
+    console.log('ERROR', error)
     return formatResponse(400, error)
   }
 }
@@ -32,8 +34,10 @@ export const appointment = async (event) => {
     const id = event.pathParameters.id
     const data = JSON.parse(event.body)
     const appointmentData = await updateData(id, data)
+    console.log('DATA', appointmentData)
     return formatResponse(200, appointmentData)
   } catch (error) {
+    console.log('ERROR', error)
     return formatResponse(400, error)
   }
 }
