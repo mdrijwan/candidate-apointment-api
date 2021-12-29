@@ -7,6 +7,6 @@ export interface Candidate {
   second_slot: string,
   third_slot: string,
   availability: string,
-  createdAt: number,
-  updatedAt: number
+  created_at: number,
+  updated_at: number
 }

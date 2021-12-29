@@ -4,7 +4,7 @@ import { Candidate } from './model'
 const dynamoDb = new DynamoDB.DocumentClient()
 const today = new Date().toISOString().slice(0, 10)
 const now = new Date().getTime()
-const table = process.env.TABLE_CANDIDATE
+const table = process.env.DYNAMODB_TABLE
 
 export async function getData (id, date) {
   let items: Candidate
@@ -36,12 +36,12 @@ export async function updateData (id, data) {
   let obj = candidateName.find(o => o.name)
   const name = obj.name
   const email = obj.email
-  let update = 'SET #c_name = :name, email = :email, first_slot = :first_slot, second_slot = :second_slot, third_slot = :third_slot, updatedAt = :updatedAt'
-  let value = { ':name': name, ':email': email, ':first_slot': data.first_slot, ':second_slot': data.second_slot, ':third_slot': data.third_slot, ':updatedAt': now }
+  let update = 'SET #c_name = :name, email = :email, first_slot = :first_slot, second_slot = :second_slot, third_slot = :third_slot, updated_at = :updated_at'
+  let value = { ':name': name, ':email': email, ':first_slot': data.first_slot, ':second_slot': data.second_slot, ':third_slot': data.third_slot, ':updated_at': now }
 
   if (existingData === undefined) {
-    update += ', createdAt = :createdAt'
-    value = Object.assign(value, { ':createdAt': now })
+    update += ', created_at = :created_at'
+    value = Object.assign(value, { ':created_at': now })
   }
 
   if (data.first_slot === 'available' || data.second_slot === 'available' || data.third_slot === 'available') {
@@ -73,7 +73,7 @@ export async function updateData (id, data) {
 export async function queryData (id) {
   const result = await dynamoDb.query({
     TableName : table,
-    IndexName : 'Candidate-index',
+    IndexName : 'Candidate-Availability-index',
     KeyConditionExpression: 'id = :id and availability = :availability',
     ExpressionAttributeValues: {
       ':id': id,
