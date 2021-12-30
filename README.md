@@ -6,7 +6,7 @@ This is a a TypeScript powered REST API backend service to create candidates and
 
 - platform: AWS
 - language: TypeScript
-- environment: NodeJS
+- runtime/environment: NodeJS
 - dbSolution: dynamoDB
 - framewrok: serverless
 - authorName: Md Rijwan Razzaq Matin
