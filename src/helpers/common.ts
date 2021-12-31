@@ -7,7 +7,7 @@ const now = new Date().getTime()
 const table = process.env.DYNAMODB_TABLE
 
 export async function getData (id, date) {
-  let items: Candidate
+  let item: Candidate
   const result = await dynamoDb.get({
     TableName : table,
     Key: {
@@ -16,9 +16,9 @@ export async function getData (id, date) {
     }
   }).promise()
   if (result.Item) {
-    items = Object.assign(result.Item)
+    item = Object.assign(result.Item)
   }
-  return items
+  return item
 }
 
 export async function createData (item: Candidate) {
