@@ -21,11 +21,14 @@ export const candidate = async (event) => {
       updated_at: now
     }
     const candidateData = await createData(item)
+    if (!candidateData) {
+      throw new Error('Candidate creation failed!')
+    }
     console.log('DATA', candidateData)
     return formatResponse(200, candidateData)
   } catch (error) {
-    console.log('ERROR', error)
-    return formatResponse(400, error)
+    console.error(error)
+    return formatResponse(400, error.message)
   }
 }
 
@@ -34,10 +37,13 @@ export const appointment = async (event) => {
     const id = event.pathParameters.id
     const data = JSON.parse(event.body)
     const appointmentData = await updateData(id, data)
+    if (!appointmentData) {
+      throw new Error('Appointment creation failed!')
+    }
     console.log('DATA', appointmentData)
     return formatResponse(200, appointmentData)
   } catch (error) {
-    console.log('ERROR', error)
-    return formatResponse(400, error)
+    console.error(error)
+    return formatResponse(400, error.message)
   }
 }
