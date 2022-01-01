@@ -1,7 +1,12 @@
 import { DynamoDB } from 'aws-sdk'
 import { Candidate } from './model'
-
-const dynamoDb = new DynamoDB.DocumentClient()
+let dynamoDb: DynamoDB.DocumentClient
+if (process.env.IS_OFFLINE) {
+  dynamoDb = new DynamoDB.DocumentClient({
+    region: 'localhost',
+    endpoint: 'http://localhost:8000'
+  })
+} else dynamoDb = new DynamoDB.DocumentClient()
 const today = new Date().toISOString().slice(0, 10)
 const now = new Date().getTime()
 const table = process.env.DYNAMODB_TABLE
