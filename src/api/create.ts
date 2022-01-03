@@ -25,9 +25,11 @@ export const candidate = async (event) => {
       throw new Error('Candidate creation failed!')
     }
     console.log('DATA', candidateData)
+
     return formatResponse(200, candidateData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
@@ -41,9 +43,11 @@ export const appointment = async (event) => {
       throw new Error('Appointment creation failed!')
     }
     console.log('DATA', appointmentData)
+
     return formatResponse(200, appointmentData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
