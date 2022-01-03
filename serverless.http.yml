@@ -1,4 +1,4 @@
-service: candidate-api
+service: candidate-http
 
 provider:
   name: aws
@@ -10,6 +10,15 @@ provider:
   environment:
     DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-candidate-table
     S3_BUCKET: ${opt:stage, self:provider.stage}-candidate-bucket
+  httpApi:
+    cors: true
+    authorizers:
+      jwtAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://dev-mdrijwan.us.auth0.com/
+        audience:
+          - https://auth0-jwt-authorizer
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -25,72 +34,53 @@ functions:
   createCandidate:
     handler: src/api/create.candidate
     events:
-      - http:
-          path: candidate
+      - httpApi:
+          path: /candidate
           method: post
-          cors: true
           authorizer:
-            name: tokenAuthorizer
-            type: token
-            resultTtlInSeconds: 0
-            identitySource: method.request.header.authorizationToken
+            name: jwtAuthorizer
           request:
             schema:
               application/json: ${file(./src/validator/candidate.json)}
   createAppointment:
     handler: src/api/create.appointment
     events:
-      - http:
-          path: appointment/{id}
+      - httpApi:
+          path: /appointment/{id}
           method: put
-          cors: true
-          authorizer:
-            name: requestAuthorizer
-            type: request
-            resultTtlInSeconds: 60
-            identitySource: method.request.header.authorizationToken
           request:
             schema:
               application/json: ${file(./src/validator/appointment.json)}
   listCandidates:
     handler: src/api/list.candidates
     events:
-      - http:
-          path: candidate
+      - httpApi:
+          path: /candidate
           method: get
-          cors: true
   listAppointments:
     handler: src/api/list.appointments
     events:
-      - http:
-          path: candidate/{id}
+      - httpApi:
+          path: /candidate/{id}
           method: get
-          cors: true
   listAvailability:
     handler: src/api/list.availability
     events:
-      - http:
-          path: availability
+      - httpApi:
+          path: /availability
           method: get
-          cors: true
   getAppointment:
     handler: src/api/get.appointment
     events:
-      - http:
-          path: appointment/{id}
+      - httpApi:
+          path: /appointment/{id}
           method: get
-          cors: true
   getAvailability:
     handler: src/api/get.availability
     events:
-      - http:
-          path: availability/{id}
+      - httpApi:
+          path: /availability/{id}
           method: get
-          cors: true
-  tokenAuthorizer:
-    handler: src/validator/tokenAuthorizer.handler
-  requestAuthorizer:
-    handler: src/validator/requestAuthorizer.handler
 
 plugins:
   - serverless-plugin-typescript

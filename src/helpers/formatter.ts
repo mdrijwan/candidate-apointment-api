@@ -1,6 +1,7 @@
 export const formatResponse = (statusCode: number, response) => {
   return {
     statusCode,
-    body: JSON.stringify(response),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(response, null, '\t'),
   }
 }
