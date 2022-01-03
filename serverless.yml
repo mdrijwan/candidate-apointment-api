@@ -1,21 +1,4 @@
 service: candidate-api
-custom:
-  dynamodb:
-    stages:
-      - dev
-    start:
-      port: 8000
-      inMemory: true
-      heapInitial: 200m
-      heapMax: 1g
-      migrate: true
-      seed: true
-      convertEmptyValues: true
-    seed:
-      domain:
-        sources:
-          - table: ${self:provider.environment.DYNAMODB_TABLE}
-            sources: [./src/resources/seedData.json]
 
 provider:
   name: aws
@@ -36,7 +19,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*"
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*'
 
 functions:
   createCandidate:
@@ -47,14 +30,13 @@ functions:
           method: post
           cors: true
           authorizer:
-            name: authorizer
+            name: tokenAuthorizer
             type: token
             resultTtlInSeconds: 0
             identitySource: method.request.header.authorizationToken
           request:
             schema:
               application/json: ${file(./src/validator/candidate.json)}
-
   createAppointment:
     handler: src/api/create.appointment
     events:
@@ -62,10 +44,14 @@ functions:
           path: appointment/{id}
           method: put
           cors: true
+          authorizer:
+            name: requestAuthorizer
+            type: request
+            resultTtlInSeconds: 60
+            identitySource: method.request.header.authorizationToken
           request:
             schema:
               application/json: ${file(./src/validator/appointment.json)}
-
   listCandidates:
     handler: src/api/list.candidates
     events:
@@ -73,7 +59,6 @@ functions:
           path: candidate
           method: get
           cors: true
-
   listAppointments:
     handler: src/api/list.appointments
     events:
@@ -81,7 +66,6 @@ functions:
           path: candidate/{id}
           method: get
           cors: true
-
   listAvailability:
     handler: src/api/list.availability
     events:
@@ -89,7 +73,6 @@ functions:
           path: availability
           method: get
           cors: true
-
   getAppointment:
     handler: src/api/get.appointment
     events:
@@ -97,7 +80,6 @@ functions:
           path: appointment/{id}
           method: get
           cors: true
-
   getAvailability:
     handler: src/api/get.availability
     events:
@@ -105,10 +87,10 @@ functions:
           path: availability/{id}
           method: get
           cors: true
-
-  authorizer:
-    handler: src/validator/authorizer.handler
+  tokenAuthorizer:
+    handler: src/validator/tokenAuthorizer.handler
+  requestAuthorizer:
+    handler: src/validator/requestAuthorizer.handler
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-dynamodb-local
