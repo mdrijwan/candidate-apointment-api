@@ -18,7 +18,7 @@ export const candidate = async (event) => {
       third_slot: 'available',
       availability: 'yes',
       created_at: now,
-      updated_at: now
+      updated_at: now,
     }
     const candidateData = await createData(item)
     if (!candidateData) {

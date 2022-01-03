@@ -1,6 +1,6 @@
-export const formatResponse = (statusCode: number, response: any): object => {
+export const formatResponse = (statusCode: number, response) => {
   return {
     statusCode,
-    body: JSON.stringify(response)
+    body: JSON.stringify(response),
   }
 }

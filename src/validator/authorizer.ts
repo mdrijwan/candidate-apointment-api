@@ -11,7 +11,7 @@ export const handler = function (event, context, callback) {
       callback(null, generatePolicy('user', 'Deny', methodArn))
       break
     case 'unauthorized':
-      callback('Unauthorized')   // Return a 401 Unauthorized response
+      callback('Unauthorized') // Return a 401 Unauthorized response
       break
     default:
       callback('Error: Invalid token') // Return a 500 Invalid token response
@@ -21,25 +21,27 @@ export const handler = function (event, context, callback) {
 }
 
 // Help function to generate an IAM policy
-function generatePolicy (principalId, effect, methodArn) {
+function generatePolicy(principalId, effect, methodArn) {
   const policyDocument = generatePolicyDocument(effect, methodArn)
 
   return {
     principalId,
-    policyDocument
+    policyDocument,
   }
 }
 
-function generatePolicyDocument (effect, methodArn) {
+function generatePolicyDocument(effect, methodArn) {
   if (!effect || !methodArn) return null
 
   const policyDocument = {
     Version: '2012-10-17',
-    Statement: [{
-      Action: 'execute-api:Invoke',
-      Effect: effect,
-      Resource: methodArn
-    }]
+    Statement: [
+      {
+        Action: 'execute-api:Invoke',
+        Effect: effect,
+        Resource: methodArn,
+      },
+    ],
   }
 
   return policyDocument

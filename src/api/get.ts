@@ -1,7 +1,7 @@
 import { formatResponse } from '../helpers/formatter'
 import { getData, queryData } from './../helpers/common'
 
-export const appointment = async event => {
+export const appointment = async (event) => {
   try {
     const id = event.pathParameters.id
     if (!event.queryStringParameters) {
@@ -22,7 +22,7 @@ export const appointment = async event => {
   }
 }
 
-export const availability = async event => {
+export const availability = async (event) => {
   try {
     const id = event.pathParameters.id
     const availabilityData = await queryData(id)
