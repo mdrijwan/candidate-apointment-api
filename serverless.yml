@@ -46,6 +46,11 @@ functions:
           path: candidate
           method: post
           cors: true
+          authorizer:
+            name: authorizer
+            type: token
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.authorizationToken
           request:
             schema:
               application/json: ${file(./src/validator/candidate.json)}
@@ -101,5 +106,9 @@ functions:
           method: get
           cors: true
 
+  authorizer:
+    handler: src/validator/authorizer.handler
+
 plugins:
   - serverless-plugin-typescript
+  - serverless-dynamodb-local

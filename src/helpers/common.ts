@@ -23,6 +23,7 @@ export async function getData (id, date) {
   if (result.Item) {
     item = Object.assign(result.Item)
   }
+
   return item
 }
 
@@ -31,6 +32,7 @@ export async function createData (item: Candidate) {
     TableName : table,
     Item: item
   }).promise()
+
   return item
 }
 
@@ -72,6 +74,7 @@ export async function updateData (id, data) {
     UpdateExpression: update,
     ReturnValues: 'ALL_NEW'
   }).promise()
+
   return result.Attributes
 }
 
@@ -86,6 +89,7 @@ export async function queryData (id) {
       ':id': id
     }
   }).promise()
+
   return result.Items
 }
 
@@ -102,6 +106,7 @@ export async function queryDate (date) {
       ':date': date
     }
   }).promise()
+
   return result.Items
 }
 
@@ -114,6 +119,7 @@ export async function queryAvailability () {
       ':availability': 'yes'
     }
   }).promise()
+
   return result.Items
 }
 
@@ -125,6 +131,7 @@ export async function scanData (id) {
       ':id': id
     }
   }).promise()
+
   return result.Items
 }
 
@@ -132,6 +139,7 @@ export async function scanTable () {
   const result = await dynamoDb.scan({
     TableName : table
   }).promise()
+
   return result.Items
 }
 
@@ -147,5 +155,6 @@ export async function getName (id) {
       '#c_name': 'name'
     }
   }).promise()
+
   return result.Items
 }

@@ -13,9 +13,11 @@ export const appointment = async event => {
       throw new Error('No data found')
     }
     console.log('DATA', appointmentData)
+
     return formatResponse(200, appointmentData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
@@ -28,9 +30,11 @@ export const availability = async event => {
       throw new Error('No data found')
     }
     console.log('DATA', availabilityData)
+
     return formatResponse(200, availabilityData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }

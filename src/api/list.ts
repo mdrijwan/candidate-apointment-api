@@ -8,9 +8,11 @@ export const candidates = async () => {
       throw new Error('No data found')
     }
     console.log('DATA', candidatesData)
+
     return formatResponse(200, candidatesData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
@@ -23,9 +25,11 @@ export const appointments = async (event) => {
       throw new Error('No data found')
     }
     console.log('DATA', appointmentsData)
+
     return formatResponse(200, appointmentsData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
@@ -38,9 +42,11 @@ export const availability = async (event) => {
       throw new Error('No data found')
     }
     console.log('DATA', availabilityData)
+
     return formatResponse(200, availabilityData)
   } catch (error) {
     console.error(error)
+
     return formatResponse(400, error.message)
   }
 }
