@@ -1,0 +1,86 @@
+service: candidate-http
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: dev
+  deploymentBucket:
+    name: ${self:provider.environment.S3_BUCKET}
+  environment:
+    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-candidate-table
+    S3_BUCKET: ${opt:stage, self:provider.stage}-candidate-bucket
+  httpApi:
+    cors: true
+    authorizers:
+      jwtAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://dev-mdrijwan.us.auth0.com/
+        audience:
+          - https://auth0-jwt-authorizer
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*'
+
+functions:
+  createCandidate:
+    handler: src/api/create.candidate
+    events:
+      - httpApi:
+          path: /candidate
+          method: post
+          authorizer:
+            name: jwtAuthorizer
+          request:
+            schema:
+              application/json: ${file(./src/validator/candidate.json)}
+  createAppointment:
+    handler: src/api/create.appointment
+    events:
+      - httpApi:
+          path: /appointment/{id}
+          method: put
+          request:
+            schema:
+              application/json: ${file(./src/validator/appointment.json)}
+  listCandidates:
+    handler: src/api/list.candidates
+    events:
+      - httpApi:
+          path: /candidate
+          method: get
+  listAppointments:
+    handler: src/api/list.appointments
+    events:
+      - httpApi:
+          path: /candidate/{id}
+          method: get
+  listAvailability:
+    handler: src/api/list.availability
+    events:
+      - httpApi:
+          path: /availability
+          method: get
+  getAppointment:
+    handler: src/api/get.appointment
+    events:
+      - httpApi:
+          path: /appointment/{id}
+          method: get
+  getAvailability:
+    handler: src/api/get.availability
+    events:
+      - httpApi:
+          path: /availability/{id}
+          method: get
+
+plugins:
+  - serverless-plugin-typescript
